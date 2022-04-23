@@ -96,7 +96,7 @@ Arch Linux 是一个滚动发行版，因此，每个月都会发布一个新的
 恭喜你！你现在已经进入 Arch Linux Live CD 了！
 你的电脑会黑屏一段时间，然后出现一堆文字，这是正常的
 
-> 如果你的电脑内存小于 4GB,请不要选择这个选项
+> 如果你的电脑内存小于 4GB,请不要选择这个选项，直接选择默认的选项，按回车即可。另外，
 > 如果你的电脑内存小于 4GB，建议把电脑丢了= =
 
 # 安装过程
@@ -141,7 +141,7 @@ station wlan0 connect [你们家wifi名称]
 
 做完这步，可以通过`ping baidu.com`来测试是否连上了网。如果一切正常，输出应该像这样：
 ![ping](./src/ping.png)
-你可以`ctrl+c`强行停止。注意，对于任何Linux的进程来说，都可以用`ctrl+c`来强制停止。
+你可以`ctrl+c`强行停止。注意，对于任何 Linux 的进程来说，都可以用`ctrl+c`来强制停止。
 
 ## 挂载分区
 
@@ -180,5 +180,43 @@ mkdir /mnt/boot
 mount /dev/sda2 /mnt/boot
 ```
 
+> 挂载硬盘的顺序不能乱！必须先挂载`/mnt`再挂载`/mnt/boot`
+
 正确的输出应该如下：
 ![mount](./src/mount.png)
+
+完成这一切后，再次输入`lsblk`来查看磁盘各个分区的挂载点是否正常
+
+![mount_fin](./src/mount_fin.png)
+可以看到，现在在右侧的`mountpoints`一栏已经出现了`/mnt`和`/mnt/boot`
+
+Done!
+
+## 安装软件包
+
+在完成上述的操作之后，你就应该开始安装软件包了。首先，要介绍一个重要的概念`包管理器(Package Manager)`。`Linux`下，万物皆包。小到字体，图标，大到系统内核，都是以包的形式呈现的。`包管理器`可以帮助用户解决包的安装，卸载，管理等操作。各个`Linux发行版`的包管理器各不相同，包的后缀也不同。`Arch Linux`的包管理器叫`pacman`(同吃豆人游戏)。
+
+包管理器负责从`软件仓库`下载包，并对其进行安装，卸载等操作。不同的包之间存在依赖，冲突的关系，包管理器就负责对这些特殊情况进行处理。具体可以查看[Arch Wiki 对于 pacman 的介绍](<https://wiki.archlinux.org/title/Pacman_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)>)
+
+在上文中，我们提到——`包管理器从软件仓库下载包`，那么，软件仓库的列表被存储在系统中的某个配置文件当中。我们需要通过配置仓库的源的方式来获得更好的体验。
+
+```bash
+systemctl stop reflector
+echo 随便什么东西 > /etc/pacman.d/mirrorlist
+```
+
+上述的命令中，我们将系统自行配置的软件源列表都删掉了。现在，我们可以开始自行配置了。  
+你需要使用一个`文本编辑器`来编辑配置文件。在这里，我推荐使用`nano`，因为其简洁，门槛低，并且，你现在可以直接使用。当然，你也可以尝试使用`vim`，如果你觉得你的智商足够高的话 ：）
+
+```bash
+nano /etc/pacman.d/mirrorlist
+```
+
+应该长这样:
+![nano_repo](./src/nano_repo.png)
+
+这里的 hello,就是你刚刚随便输入的东西，不用管他，删掉就可以了。然后，你需要写入:`Server=https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch`
+
+> 在这里，我选择了[USTC 的镜像源](https://mirrors.ustc.edu.cn)
+
+![nano_mirror](./src/nano_mirror.png)
